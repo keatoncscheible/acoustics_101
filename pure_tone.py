@@ -1,9 +1,8 @@
 import numpy as np
-from stimuli import Stimuli
-import time
+from stimulus import Stimulus
 
 
-class PureToneMono(Stimuli):
+class PureToneMono(Stimulus):
     """Pure Sine Wave (Mono)"""
 
     def __init__(self, Fs=48e3, A=1, f=1e3, theta=0, duration=1):
@@ -22,7 +21,7 @@ class PureToneMono(Stimuli):
         return (data, self.pa_flag)
 
 
-class PureToneStereo(Stimuli):
+class PureToneStereo(Stimulus):
     """Pure Sine Wave (Stereo)"""
 
     def __init__(self, Fs=48e3, A_L=1, f_L=1e3, theta_L=0, A_R=1, f_R=1e3,

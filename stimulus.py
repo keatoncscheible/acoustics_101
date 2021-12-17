@@ -4,7 +4,7 @@ import numpy as np
 from abc import ABC, abstractmethod
 
 
-class Stimuli(ABC):
+class Stimulus(ABC):
 
     def __init__(self, frames_per_buffer=1024):
         """Stimuli Abstract Base Class
