@@ -8,7 +8,7 @@ class Stimuli(ABC):
 
     def __init__(self, frames_per_buffer=1024):
         """Stimuli Abstract Base Class
-        
+
         The concrete class must define the following properties:
             Fs              - Sample rate in Hz
             duration        - Stimuli playback duration in seconds
@@ -50,6 +50,7 @@ class Stimuli(ABC):
                                          channels=self.num_channels,
                                          rate=int(self.Fs),
                                          output=True,
+                                         start=False,
                                          stream_callback=self.callback,
                                          frames_per_buffer=frames_per_buffer)
 
@@ -73,22 +74,41 @@ class Stimuli(ABC):
             self.pa_flag = pyaudio.paComplete
 
     def play(self):
-        """Play the stimulus for the configured duration, then stop"""
+        """Play the stimulus
+        
+        The stimulus will be played until either the configured duration is
+        reached or until stop() is called. is_playing() can be used to check 
+        if the stimulus is actively producing audio.
+        """
+        # no need to do anything if we are already playing
+        if self._stream.is_active():
+            return
+
+        # stream must be stopped before it can be started
+        if not self._stream.is_stopped():
+            self._stream.stop_stream()
+
         # start the stream
         self._frame = 0
         self.pa_flag = pyaudio.paContinue
         self._stream.start_stream()
 
-        # wait for stream to finish
-        while self._stream.is_active():
-            time.sleep(0.1)
+    def is_playing(self):
+        """Check if the stimulus is playing"""
+        return self._stream.is_active()
 
-        # stop the stream
+    def stop(self):
+        """Stop playing the stimulus"""
         self._stream.stop_stream()
+    
+    def is_stopped(self):
+        """Check if the stimulus is stopped"""
+        return self._stream.is_stopped()
 
     def done(self):
-        """Close the stream and shutdown PyAudio when done with the stimuli"""
-        # close the stream
+        """Stop and close the stream and shutdown PyAudio"""
+        # stop and close the stream
+        self._stream.stop_stream()
         self._stream.close()
 
         # close PyAudio
