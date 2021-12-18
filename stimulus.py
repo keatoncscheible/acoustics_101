@@ -117,7 +117,7 @@ class Stimulus(ABC):
 class PureToneMono(Stimulus):
     """Pure Sine Wave (Mono)"""
 
-    def __init__(self, Fs=48e3, A=1, f=1e3, theta=0, duration=1):
+    def __init__(self, Fs=48e3, A=1, f=1e3, theta=0, duration=np.inf):
         self.num_channels = 1
         self.Fs = Fs
         self.A = A
@@ -137,7 +137,7 @@ class PureToneStereo(Stimulus):
     """Pure Sine Wave (Stereo)"""
 
     def __init__(self, Fs=48e3, A_L=1, f_L=1e3, theta_L=0, A_R=1, f_R=1e3,
-                 theta_R=0, duration=1):
+                 theta_R=0, duration=np.inf):
         self.num_channels = 2
         self.Fs = Fs
         self.A_L = A_L
