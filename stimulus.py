@@ -42,9 +42,10 @@ class Stimulus(ABC):
 
         # Ensure a valid sample rate was provided
         supported_sample_rates = [44100, 48000]
-        assert self.Fs in supported_sample_rates,   \
-            "Sample rate of {0} Hz is not supported. Supported sample rates are {1}".format(
-                self.Fs, supported_sample_rates)
+        if self.Fs not in supported_sample_rates:
+            raise ValueError(
+                "Sample rate of {0} Hz is not supported. Supported sample rates are {1}".format(
+                    self.Fs, supported_sample_rates))
 
         # Sample period
         self.Ts = 1/self.Fs
