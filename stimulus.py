@@ -34,6 +34,12 @@ class Stimulus(ABC):
         def num_channels(self):
             ...
 
+        # Get a list of all the controllable stimulus parameters
+        self.parameters = list(
+            set(dir(self)) - set(dir(self.__class__.__bases__[0])))
+        self.parameters.remove("Fs")
+        self.parameters.remove("num_channels")
+
         # Ensure a valid sample rate was provided
         supported_sample_rates = [44100, 48000]
         assert self.Fs in supported_sample_rates,   \
