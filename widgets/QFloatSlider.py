@@ -1,38 +1,37 @@
-from PyQt5 import QtCore
 from PyQt5.QtWidgets import QSlider
-from PyQt5.QtCore import pyqtSlot, pyqtSignal
+from PyQt5.QtCore import pyqtSignal
 
 
-class FloatSlider(QSlider):
+class QFloatSlider(QSlider):
 
     valueChanged = pyqtSignal(float)
 
-    def __init__(self, parent, minimum=0, maximum=1.0, precision=0.1, page_precision=1):
+    def __init__(self, parent, minimum=0, maximum=1.0, precision=0.1, pagePrecision=1):
         """Floating point slider
 
         FloatSlider is a floating point implementation of the QSlider widget.
         The 'precision' value sets the step size of the slider and the 
-        'page_precision' value sets the page step size. The range of the 
+        'pagePrecision' value sets the page step size. The range of the 
         slider, (maximum - minimum), must be divisible by both the 'precision'
-        and the 'page_precision'. Also, 'page_precision' must be a multiple of
+        and the 'pagePrecision'. Also, 'pagePrecision' must be a multiple of
         'precision'.
         """
 
-        super(FloatSlider, self).__init__(parent)
+        super(QFloatSlider, self).__init__(parent)
         super().valueChanged.connect(self._valueChanged)
 
         # Load variables that are returned by the propery getters
         self._minimum = minimum
         self._maximum = maximum
         self._precision = precision
-        self._page_precision = page_precision
+        self._pagePrecision = pagePrecision
         self._value = minimum
 
         # Call the property setters to propagate the updated values to the parent widget
         self.minimum = minimum
         self.maximum = maximum
         self.precision = precision
-        self.page_precision = page_precision
+        self.pagePrecision = pagePrecision
 
     def _valueChanged(self, value: int) -> None:
         self.valueChanged.emit(float(value * self.precision))
@@ -44,16 +43,16 @@ class FloatSlider(QSlider):
     @minimum.setter
     def minimum(self, value):
 
-        slider_range = self.maximum - value
+        sliderRange = self.maximum - value
 
-        if slider_range / self._precision != int(slider_range / self._precision):
+        if sliderRange / self._precision != int(sliderRange / self._precision):
             raise ValueError(
                 'Slider range must be an integer multiple of precision')
 
         self._minimum = value
-        self._minimum_int = int(value / self._precision)
+        self._minimumInt = int(value / self._precision)
 
-        super(FloatSlider, self).setMinimum(self._minimum_int)
+        super(QFloatSlider, self).setMinimum(self._minimumInt)
 
     @property
     def maximum(self):
@@ -62,16 +61,16 @@ class FloatSlider(QSlider):
     @maximum.setter
     def maximum(self, value):
 
-        slider_range = value - self.minimum
+        sliderRange = value - self.minimum
 
-        if slider_range / self._precision != int(slider_range / self._precision):
+        if sliderRange / self._precision != int(sliderRange / self._precision):
             raise ValueError(
                 'Slider range must be an integer multiple of precision')
 
         self._maximum = value
-        self._maximum_int = int(value / self._precision)
+        self._maximumInt = int(value / self._precision)
 
-        super(FloatSlider, self).setMaximum(self._maximum_int)
+        super(QFloatSlider, self).setMaximum(self._maximumInt)
 
     @property
     def precision(self):
@@ -79,37 +78,36 @@ class FloatSlider(QSlider):
 
     @precision.setter
     def precision(self, value):
-        slider_range = self.maximum - self.minimum
+        sliderRange = self.maximum - self.minimum
 
-        if slider_range / value != int(slider_range / value):
+        if sliderRange / value != int(sliderRange / value):
             raise ValueError(
                 'Slider range must be an integer multiple of precision')
 
-        if self._page_precision / value != int(self._page_precision / value):
+        if self._pagePrecision / value != int(self._pagePrecision / value):
             raise ValueError(
                 'Page precision must be an integer multiple of precision')
 
-        # precision_change_scale_factor = self._precision / value
         self._precision = value
         self.minimum = self.minimum
         self.maximum = self.maximum
-        self.page_precision = self.page_precision
+        self.pagePrecision = self.pagePrecision
 
     @property
-    def page_precision(self):
-        return self._page_precision
+    def pagePrecision(self):
+        return self._pagePrecision
 
-    @page_precision.setter
-    def page_precision(self, value):
+    @pagePrecision.setter
+    def pagePrecision(self, value):
 
         if value / self.precision != int(value / self.precision):
             raise ValueError(
                 'Page precision must be an integer multiple of precision')
 
-        self._page_precision = value
-        self._page_precision_int = int(value / self.precision)
+        self._pagePrecision = value
+        self._pagePrecisionInt = int(value / self.precision)
 
-        super(FloatSlider, self).setPageStep(self._page_precision_int)
+        super(QFloatSlider, self).setPageStep(self._pagePrecisionInt)
 
     @property
     def value(self):
@@ -123,16 +121,16 @@ class FloatSlider(QSlider):
                 'Value must be an integer multiple of precision')
 
         self._value = value
-        self._value_int = int(value / self._precision)
+        self._valueInt = int(value / self._precision)
 
-        super(FloatSlider, self).setValue(self._value_int)
-        super(FloatSlider, self).setSliderPosition(self._value_int)
+        super(QFloatSlider, self).setValue(self._valueInt)
+        super(QFloatSlider, self).setSliderPosition(self._valueInt)
 
     @property
     def range(self):
         return self.minimum, self.maximum
 
-    def set_range(self, minimum, maximum):
+    def setRange(self, minimum, maximum):
         """Set the minimum and maximum values"""
         self.maximum = maximum
         self.minimum = minimum

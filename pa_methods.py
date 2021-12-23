@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QComboBox, QWidget, QLabel, QTextEdit
 from PyQt5.QtCore import pyqtSlot
 from pyqtgraph import PlotWidget, ScatterPlotItem
 from stimulus import EnvelopeGenerator, Stimulus, PureToneMono, PureToneStereo
-from widgets.float_slider import FloatSlider
+from widgets.QFloatSlider import QFloatSlider
 
 
 class PaMethods(ABC):
@@ -93,7 +93,7 @@ class MethodOfAdjustmentWidget(QWidget):
         self.stimulusControlLabel = parent.findChild(
             QLabel, 'stimulusControlLabel')
         self.stimulusControlSlider = parent.findChild(
-            FloatSlider, 'stimulusControlSlider')
+            QFloatSlider, 'stimulusControlSlider')
         self.testSelectorDropdown = parent.findChild(
             QComboBox, 'testSelectorDropdown')
         self.testResultsPlot = parent.findChild(
@@ -122,10 +122,10 @@ class MethodOfAdjustmentWidget(QWidget):
 
         self.stimulusControlLabel.setText(self.obj.stimulus_control['label'])
 
-        self.stimulusControlSlider.set_range(
+        self.stimulusControlSlider.setRange(
             self.obj.stimulus_control['min'], self.obj.stimulus_control['max'])
         self.stimulusControlSlider.precision = self.obj.stimulus_control['precision']
-        self.stimulusControlSlider.page_precision = self.obj.stimulus_control['page_precision']
+        self.stimulusControlSlider.pagePrecision = self.obj.stimulus_control['page_precision']
         self.stimulusControlSlider.value = self.obj.stimulus_control['default']
 
         self.testResultsPlot.plotItem.setTitle(self.obj.plot_control['title'])

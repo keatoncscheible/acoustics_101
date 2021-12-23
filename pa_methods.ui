@@ -462,7 +462,7 @@
                </widget>
               </item>
               <item>
-               <widget class="FloatSlider" name="stimulusControlSlider">
+               <widget class="QFloatSlider" name="stimulusControlSlider">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -574,9 +574,9 @@
    </slots>
   </customwidget>
   <customwidget>
-   <class>FloatSlider</class>
+   <class>QFloatSlider</class>
    <extends>QSlider</extends>
-   <header>widgets/float_slider</header>
+   <header>widgets/QFloatSlider</header>
    <slots>
     <signal>valueChanged(float)</signal>
    </slots>

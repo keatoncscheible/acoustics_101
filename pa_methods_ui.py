@@ -164,7 +164,7 @@ class Ui_PaMethodsWindow(object):
         self.stimulusControlLabel.setFont(font)
         self.stimulusControlLabel.setObjectName("stimulusControlLabel")
         self.stimulusControlLayout.addWidget(self.stimulusControlLabel, 0, QtCore.Qt.AlignHCenter|QtCore.Qt.AlignBottom)
-        self.stimulusControlSlider = FloatSlider(self.methodOfAdjustmentTab)
+        self.stimulusControlSlider = QFloatSlider(self.methodOfAdjustmentTab)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -247,7 +247,7 @@ class Ui_PaMethodsWindow(object):
 
 from pa_methods import MethodOfAdjustmentWidget
 from pyqtgraph import PlotWidget
-from widgets.float_slider import FloatSlider
+from widgets.QFloatSlider import QFloatSlider
 
 if __name__ == "__main__":
     import sys
