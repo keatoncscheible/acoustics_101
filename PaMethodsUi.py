@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\Users\keato\git\acoustics_101\pa_methods.ui'
+# Form implementation generated from reading ui file 'C:\Users\keato\git\acoustics_101\PaMethods.ui'
 #
 # Created by: PyQt5 UI code generator 5.9.2
 #
@@ -183,7 +183,7 @@ class Ui_PaMethodsWindow(object):
         self.plotAndStimulusControlLayout.addLayout(self.stimulusControlLayout)
         self.horizontalLayout.addLayout(self.plotAndStimulusControlLayout)
         self.gridLayout_2.addLayout(self.horizontalLayout, 1, 0, 1, 1)
-        self.MethodOfAdjusment = MethodOfAdjustmentWidget(self.methodOfAdjustmentTab)
+        self.MethodOfAdjusment = QMethodOfAdjustment(self.methodOfAdjustmentTab)
         self.MethodOfAdjusment.setObjectName("MethodOfAdjusment")
         self.gridLayout_2.addWidget(self.MethodOfAdjusment, 0, 0, 1, 1)
         self.methodsAndProceduresTabs.addTab(self.methodOfAdjustmentTab, "")
@@ -217,11 +217,11 @@ class Ui_PaMethodsWindow(object):
 
         self.retranslateUi(PaMethodsWindow)
         self.methodsAndProceduresTabs.setCurrentIndex(0)
-        self.testControlStartButton.clicked.connect(self.MethodOfAdjusment.start_test)
-        self.testControlStopButton.clicked.connect(self.MethodOfAdjusment.stop_test)
-        self.stimulusButton.clicked.connect(self.MethodOfAdjusment.update_data)
-        self.stimulusControlSlider.valueChanged[float].connect(self.MethodOfAdjusment.adjust_stimulus)
-        self.testSelectorDropdown.activated[str].connect(self.MethodOfAdjusment.select_test)
+        self.testControlStartButton.clicked.connect(self.MethodOfAdjusment.startTest)
+        self.testControlStopButton.clicked.connect(self.MethodOfAdjusment.stopTest)
+        self.stimulusButton.clicked.connect(self.MethodOfAdjusment.updateData)
+        self.stimulusControlSlider.valueChanged[float].connect(self.MethodOfAdjusment.adjustStimulus)
+        self.testSelectorDropdown.activated[str].connect(self.MethodOfAdjusment.selectTest)
         QtCore.QMetaObject.connectSlotsByName(PaMethodsWindow)
 
     def retranslateUi(self, PaMethodsWindow):
@@ -245,9 +245,9 @@ class Ui_PaMethodsWindow(object):
         self.methodsAndProceduresTabs.setTabText(self.methodsAndProceduresTabs.indexOf(self.adaptiveProceduresTab), _translate("PaMethodsWindow", "Adaptive Procedures"))
         self.methodsAndProceduresTabs.setTabText(self.methodsAndProceduresTabs.indexOf(self.comparisonOfStimulusPairsTab), _translate("PaMethodsWindow", "Comparison of Stimulus Pairs"))
 
-from pa_methods import MethodOfAdjustmentWidget
 from pyqtgraph import PlotWidget
 from widgets.QFloatSlider import QFloatSlider
+from widgets.QMethodOfAdjustment import QMethodOfAdjustment
 
 if __name__ == "__main__":
     import sys

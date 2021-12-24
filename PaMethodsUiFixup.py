@@ -4,7 +4,7 @@ signal_slot_connection_bug_regex = re.compile(r'\[\'([a-zA-Z0-9_]+)\'\]\.connect
 deprecated_qstring_regex = re.compile(r'(QString)')
 
 fixed_ui_file = ''
-with open('pa_methods_ui.py', "r") as file:
+with open('PaMethodsUi.py', "r") as file:
     for line in file:
 
         result = signal_slot_connection_bug_regex.search(line)
@@ -17,5 +17,5 @@ with open('pa_methods_ui.py', "r") as file:
 
         fixed_ui_file += line
             
-with open('pa_methods_ui.py', "w") as file:
+with open('PaMethodsUi.py', "w") as file:
     file.write(fixed_ui_file)
