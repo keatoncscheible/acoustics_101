@@ -79,4 +79,4 @@ class QMethodOfAdjustment(QWidget):
         self.stimulusControlSlider.value = self.obj.stimulusControl['value']
         self.scatterPlot.addPoints(
             self.obj.testResults['independent'], self.obj.testResults['dependent'])
-4
+
