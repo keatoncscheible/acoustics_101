@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import random
 import numpy as np
-from stimulus import EnvelopeGenerator, Stimulus, PureToneMono, PureToneStereo
+from stimulus import EnvelopeGenerator, Stimulus, PureToneMono, PureToneStereo, VolumeMode
 
 
 class PaMethods(ABC):
@@ -17,9 +17,10 @@ class PaMethods(ABC):
         if not isinstance(self.stimulus, Stimulus):
             raise ValueError('stimulus must be a Stimulus object')
 
-        # Create empty lists to log each stimulus parameter
-        for parameter in self.stimulus.parameters:
-            setattr(self, '{}_log'.format(parameter), [])
+        # # Create empty lists to log each stimulus parameter
+        # for parameter in self.stimulus.parameters:
+        #     setattr(self, '{}_log'.format(parameter), [])
+
 
         @property
         def tests(self):
@@ -30,7 +31,15 @@ class PaMethods(ABC):
             raise ValueError(
                 'tests must be a list of strings with the name of each test')
 
-        self._activeTest = self.tests[0]
+    def resetParameterLogs(self):
+        # Delete existing logs
+        for parameter in dir(self):
+            if '_log' in parameter:
+                delattr(self, parameter)
+
+        # Create empty lists to log each stimulus parameter
+        for parameter in self.stimulus.parameters:
+            setattr(self, '{}_log'.format(parameter), [])
 
     @abstractmethod
     def startTest(self):
@@ -69,7 +78,8 @@ class PaMethods(ABC):
             parameterAttr = getattr(self.stimulus, parameter)
             if isinstance(parameterAttr, EnvelopeGenerator):
                 parameterData = parameterAttr.setpoint
-            if isinstance(parameterAttr, int) or isinstance(parameterAttr, float):
+            if isinstance(parameterAttr, int) or isinstance(parameterAttr, float) \
+                or isinstance(parameterAttr, VolumeMode):
                 parameterData = parameterAttr
             getattr(self, '{}_log'.format(parameter)).append(parameterData)
 
@@ -86,14 +96,26 @@ class PaMethods(ABC):
 class MethodOfAdjustment(PaMethods):
     """Method of Adjustment"""
 
-    def __init__(self):
-        self.stimulus = PureToneMono()
-        self.tests = ['Hearing Threshold', 'Tone Match', 'Octave Match']
+    def __init__(self, test=None):
+
         self.stimulusControl = {}
         self.testControl = {}
         self.testResults = {}
         self.plotControl = {}
         self.testInformation = {}
+
+        self.tests = ['Hearing Threshold', 'Tone Match', 'Octave Match']
+        if test is None:
+            test = self.tests[0]
+            self._activeTest = self.tests[0]
+        
+        if test == 'Hearing Threshold':
+            self.configureHearingThresholdTest()
+        elif test == 'Tone Match':
+            self.configureToneMatchTest()
+        elif test == 'Octave Match':
+            self.configureOctaveMatchTest()
+
         super().__init__()
 
     def startTest(self):
@@ -104,6 +126,10 @@ class MethodOfAdjustment(PaMethods):
 
     def adjustStimulus(self, value):
         super().adjustStimulus(**{self.stimulusControl['parameter']: value})
+
+    def selectTest(self, test):
+        self.stimulus.done()
+        super().selectTest(test)
 
     def updateData(self):
         self.logStimulus()
@@ -152,12 +178,47 @@ class MethodOfAdjustment(PaMethods):
             self.stimulusControl['parameter'])
 
     def updateToneMatchTestData(self):
-        pass
+        usedFrequencies = self.getLoggedData(self.testControl['parameter'])
+
+        # Select a new test frequency
+        # This algorithm randomly selects a new test frequency from the
+        # parameter list. When there are no frequencies left in the parameter
+        # list, a new list of frequencies is generated, where all the new
+        # frequencies are equally spaced between the existing frequencies.
+        self.testControl['parameterList'] = list(
+            set(self.testControl['parameterList']) - set(usedFrequencies))
+        if(len(self.testControl['parameterList']) == 0):
+            self.testControl['parameterSearchPrecision'] /= 2
+            self.testControl['parameterList'] = np.arange(
+                self.testControl['parameterSearchPrecision'], self.testControl['max'],
+                self.testControl['parameterSearchPrecision'])
+            self.testControl['parameterList'] = list(
+                set(self.testControl['parameterList']) - set(usedFrequencies))
+
+        nextFrequency = random.choice(
+            self.testControl['parameterList'])
+
+        # Reset the volume to the default level
+        self.stimulusControl['value'] = self.stimulusControl['default']
+        # Adjust the frequency
+        setattr(self.stimulus,
+                self.testControl['parameter'], nextFrequency)
+        # Reset the volume to the default value
+        setattr(self.stimulus,
+                self.stimulusControl['parameter'], self.stimulusControl['default'])
+
+        # Save the independent and dependent test results
+        actualFrequencies = np.array(self.getLoggedData(self.testControl['parameter']))
+        guessedFrequencies = np.array(self.getLoggedData(self.stimulusControl['parameter']))
+        self.testResults['independent'] = actualFrequencies 
+        self.testResults['dependent'] = np.abs(actualFrequencies - guessedFrequencies)
 
     def updateOctaveMatchTestData(self):
         pass
 
     def configureHearingThresholdTest(self):
+        self.stimulus = PureToneMono()
+        self.resetParameterLogs()
 
         self.testInformation['instructions'] = \
             '<ol>' \
@@ -204,7 +265,52 @@ class MethodOfAdjustment(PaMethods):
         self.testResults['dependent'] = []
 
     def configureToneMatchTest(self):
-        pass
+        self.stimulus = PureToneStereo()
+        self.resetParameterLogs()
+
+        self.testInformation['instructions'] = \
+            '<ol>' \
+            '<li>Start the test by pressing the <b>Start Test</b> button. You should hear a tone.</li><br>' \
+            '<li>Use the slider to adjust the volume until the tone is just barely peceivable, then press the <b>Update Plot</b> button.</li><br>' \
+            '<li>Repeat step 2 to capture additional data points.</li><br>' \
+            '<li>Press the <b>Stop Test</b> button when you are finished.</li>' \
+            '</ol>'
+
+        self.stimulusControl['parameter'] = 'f_R'
+        self.stimulusControl['min'] = 100
+        self.stimulusControl['max'] = 15000
+        self.stimulusControl['default'] = 100
+        self.stimulusControl['precision'] = 0.1
+        self.stimulusControl['pagePrecision'] = 1
+        self.stimulusControl['label'] = 'Frequency'
+        self.stimulusControl['value'] = self.stimulusControl['default']
+        setattr(self.stimulus,
+                self.stimulusControl['parameter'], self.stimulusControl['default'])
+
+        self.testControl['parameter'] = 'f_L'
+        self.testControl['min'] = 100
+        self.testControl['max'] = 15000
+        self.testControl['default'] = 1000
+        self.testControl['value'] = self.testControl['default']
+        self.testControl['parameterSearchPrecision'] = 1000
+        self.testControl['parameterList'] = np.arange(
+            self.testControl['parameterSearchPrecision'], self.testControl['max'],
+            self.testControl['parameterSearchPrecision'])
+        setattr(self.stimulus,
+                self.testControl['parameter'], self.testControl['default'])
+
+        self.plotControl['title'] = 'Tone Match Error Vs Frequency'
+        self.plotControl['xmin'] = self.testControl['min']
+        self.plotControl['xmax'] = self.testControl['max']
+        self.plotControl['ymin'] = 0
+        self.plotControl['ymax'] = 5000
+        self.plotControl['xlabel'] = 'Frequency'
+        self.plotControl['xunits'] = 'Hz'
+        self.plotControl['ylabel'] = 'Tone Match Error'
+        self.plotControl['yunits'] = 'Hz'
+
+        self.testResults['independent'] = []
+        self.testResults['dependent'] = []
 
     def configureOctaveMatchTest(self):
         pass

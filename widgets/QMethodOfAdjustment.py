@@ -27,6 +27,7 @@ class QMethodOfAdjustment(QWidget):
         self.configureUi(testName)
 
     def configureUi(self, test):
+        self.scatterPlot.clear()
         if test == 'Hearing Threshold':
             self.obj.configureHearingThresholdTest()
         elif test == 'Tone Match':
@@ -59,6 +60,7 @@ class QMethodOfAdjustment(QWidget):
 
     @pyqtSlot(str)
     def selectTest(self, test):
+        self.obj.selectTest(test)
         self.configureUi(test)
 
     @pyqtSlot()
